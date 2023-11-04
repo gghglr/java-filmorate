@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.Controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.Exception.Exсeption;
+import ru.yandex.practicum.filmorate.Exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -25,7 +25,7 @@ public class UserController {
         if (user.getEmail().isEmpty() || user.getEmail().indexOf("@") == -1 || user.getLogin().isEmpty() ||
                 user.getLogin().indexOf(" ") != -1 || LocalDate.now().compareTo(user.getBirthday()) <= 0) {
             log.error("ошибка в заполненных данных");
-            throw new Exсeption("Ошибка в заполненных данных");
+            throw new ValidationException("Ошибка в заполненных данных");
         }
         user.setId(generatedId++);
         if (user.getName() == null) {

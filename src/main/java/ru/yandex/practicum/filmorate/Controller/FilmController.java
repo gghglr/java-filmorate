@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.Controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.Exception.Exсeption;
+import ru.yandex.practicum.filmorate.Exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
@@ -25,7 +25,7 @@ public class FilmController {
         if (film.getName().isEmpty() || film.getDescription().length() >= 200 ||
                 film.getReleaseDate().compareTo(LocalDate.of(1895, 12, 28)) < 0 || film.getDuration() < 0) {
             log.error("ошибка в заполненных данных");
-            throw new Exсeption("Ошибка в заполненных данных");
+            throw new ValidationException("Ошибка в заполненных данных");
         }
         film.setId(generateId++);
         filmStorage.put(film.getId(), film);
