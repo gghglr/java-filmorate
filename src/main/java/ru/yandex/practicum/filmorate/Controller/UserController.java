@@ -23,12 +23,13 @@ public class UserController {
     @PostMapping("/users")
     public User addUser(@RequestBody User user) {
         if (user.getEmail().isEmpty() || user.getEmail().indexOf("@") == -1 || user.getLogin().isEmpty() ||
-                user.getLogin().indexOf(" ") != -1 || LocalDate.now().compareTo(user.getBirthday()) <= 0) {
+                user.getLogin().indexOf(" ") != -1 || user.getLogin().equals("")
+                || LocalDate.now().compareTo(user.getBirthday()) <= 0) {
             log.error("ошибка в заполненных данных");
             throw new ValidationException("Ошибка в заполненных данных");
         }
         user.setId(generatedId++);
-        if (user.getName() == null) {
+        if (user.getName() == null || user.getName().equals("")) {
             user.setName(user.getLogin());
         }
         userStorage.put(user.getId(), user);
