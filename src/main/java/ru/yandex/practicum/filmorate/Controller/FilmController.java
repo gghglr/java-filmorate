@@ -23,8 +23,8 @@ public class FilmController {
     @PostMapping("/films")
     public Film addFilm(@RequestBody Film film) {
         if (film.getName().isEmpty() || film.getName().equals("") || film.getDescription().length() >= 200 ||
-                film.getDescription().equals("") || film.getReleaseDate().
-                compareTo(LocalDate.of(1895, 12, 28)) < 0 || film.getDuration() < 0) {
+                film.getDescription().equals("") || film.getReleaseDate()
+                .compareTo(LocalDate.of(1895, 12, 28)) < 0 || film.getDuration() < 0) {
             log.error("ошибка в заполненных данных");
             throw new ValidationException("Ошибка в заполненных данных");
         }
