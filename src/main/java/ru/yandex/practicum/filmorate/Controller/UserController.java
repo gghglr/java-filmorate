@@ -1,50 +1,68 @@
 package ru.yandex.practicum.filmorate.Controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.Exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @Slf4j
+@Component
 @RestController
 public class UserController {
 
     private final Map<Integer, User> userStorage = new HashMap<>();
     private Integer generatedId = 1;
+    private UserStorage inMemoryUserStorage;
+    private UserService userService;
+
+    @Autowired
+    public UserController() {
+        userService = new UserService();
+        inMemoryUserStorage = userService.getStorage();
+    }
 
     @GetMapping("/users")
-    public List<User> showAllFilm() {
-        return new ArrayList<>(userStorage.values());
+    public List<User> showAllUser() {
+        return inMemoryUserStorage.getAllUser();
+    }
+
+    @GetMapping("/users/{id}")
+    public User getUserById(@PathVariable Integer id) {
+        return userService.getById(id);
     }
 
     @PostMapping("/users")
     public User addUser(@RequestBody User user) {
-        if (user.getEmail().isEmpty() || user.getEmail().indexOf("@") == -1 || user.getLogin().isEmpty() ||
-                user.getLogin().indexOf(" ") != -1 || user.getLogin().equals("")
-                || LocalDate.now().compareTo(user.getBirthday()) <= 0) {
-            log.error("ошибка в заполненных данных");
-            throw new ValidationException("Ошибка в заполненных данных");
-        }
-        user.setId(generatedId++);
-        if (user.getName() == null || user.getName().equals("")) {
-            user.setName(user.getLogin());
-        }
-        userStorage.put(user.getId(), user);
-        return user;
+        return inMemoryUserStorage.addUser(user);
     }
 
     @PutMapping("/users")
     public User update(@RequestBody User user) {
-        if (userStorage.containsKey(user.getId())) {
-            userStorage.remove(user.getId());
-            userStorage.put(user.getId(), user);
-        } else {
-            System.out.println("нечего доавбить");
-            throw new RuntimeException("нечего обновлять");
-        }
-        return user;
+        return inMemoryUserStorage.update(user);
+    }
+
+    @PutMapping("/users/{id}/friends/{friendId}")
+    public User addFriend(@PathVariable int id, @PathVariable int friendId) {
+        return userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("/users/{id}/friends/{friendId}")
+    public User deleteFriend(@PathVariable int id, @PathVariable int friendId) {
+        return userService.deleteFriend(id, friendId);
+    }
+
+    @GetMapping("/users/{id}/friends")
+    public List<User> showAllFriend(@PathVariable int id) {
+        return userService.showAllFriend(id);
+    }
+
+    @GetMapping("/users/{id}/friends/common/{otherId}")
+    public List<User> showMutualFriends(@PathVariable int id, @PathVariable int otherId) {
+        return userService.showMutualFriend(id, otherId);
     }
 }
