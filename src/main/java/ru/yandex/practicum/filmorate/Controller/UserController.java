@@ -20,7 +20,7 @@ public class UserController {
 
     @Autowired
     public UserController(UserService userService) {
-        this.userService =userService;
+        this.userService = userService;
         inMemoryUserStorage = userService.getStorage();
     }
 
