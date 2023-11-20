@@ -15,14 +15,12 @@ import java.util.*;
 @RestController
 public class UserController {
 
-    private final Map<Integer, User> userStorage = new HashMap<>();
-    private Integer generatedId = 1;
     private UserStorage inMemoryUserStorage;
     private UserService userService;
 
     @Autowired
-    public UserController() {
-        userService = new UserService();
+    public UserController(UserService userService) {
+        this.userService =userService;
         inMemoryUserStorage = userService.getStorage();
     }
 

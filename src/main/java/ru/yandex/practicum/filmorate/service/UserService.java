@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.Exception.NotFoundException;
+import ru.yandex.practicum.filmorate.Exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -16,8 +16,8 @@ public class UserService {
     private UserStorage userStorage;
 
     @Autowired
-    public UserService() {
-        userStorage = new InMemoryUserStorage();
+    public UserService(UserStorage userStorage) {
+        this.userStorage = userStorage;
     }
 
     public User addFriend(Integer sentRequestId, Integer getRequestId) {
@@ -29,7 +29,7 @@ public class UserService {
             getRequestUser.addFriend(sentRequestId);
             return sentRequestUser;
         } else {
-            throw new NotFoundException("Пользователь не найден");
+            throw new DataNotFoundException("Пользователь не найден");
         }
     }
 
@@ -77,7 +77,7 @@ public class UserService {
         if (userStorage.getUserStorage().containsKey(id)) {
             return userStorage.getUserStorage().get(id);
         } else {
-            throw new NotFoundException("Пользователь не найден");
+            throw new DataNotFoundException("Пользователь не найден");
         }
     }
 }

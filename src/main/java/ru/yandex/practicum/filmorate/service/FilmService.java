@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.Exception.NotFoundException;
+import ru.yandex.practicum.filmorate.Exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
@@ -16,8 +16,8 @@ public class FilmService {
     private FilmStorage inMemoryFilmStorage;
 
     @Autowired
-    public FilmService() {
-        inMemoryFilmStorage = new InMemoryFilmStorage();
+    public FilmService(FilmStorage inMemoryFilmStorage) {
+        this.inMemoryFilmStorage = inMemoryFilmStorage;
     }
 
     public Set<Integer> setLike(Integer idFilm, Integer userId) {
@@ -52,7 +52,7 @@ public class FilmService {
         if (inMemoryFilmStorage.getFilmMap().containsKey(id)) {
             return inMemoryFilmStorage.getFilmMap().get(id);
         } else {
-            throw new NotFoundException("Фильм не найден");
+            throw new DataNotFoundException("Фильм не найден");
         }
     }
 

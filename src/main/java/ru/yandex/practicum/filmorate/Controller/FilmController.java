@@ -19,9 +19,9 @@ public class FilmController {
     private FilmService filmService;
 
     @Autowired
-    public FilmController() {
-        filmService = new FilmService();
+    public FilmController(FilmService filmService) {
         inMemoryFilmStorage = filmService.getFilmStorage();
+        this.filmService = filmService;
     }
 
     @GetMapping("/films")
