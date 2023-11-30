@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import ru.yandex.practicum.filmorate.Exception.DataNotFoundException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,12 +15,15 @@ import java.util.Set;
 @Data
 public class Film {
 
-    private Integer id;
+    //таблица жанров: индитификатор жанра(ключ), название жанра
+    //таблица лайков: filId, Id user, который поставил лайк
+    private Integer filmId;
     private String name;
     private String description;
     private LocalDate releaseDate;
     private Long duration;
     private Set<Integer> likes = new HashSet<>();
+    private String rating;
 
     public void setLike(Integer id) {
         likes.add(id);

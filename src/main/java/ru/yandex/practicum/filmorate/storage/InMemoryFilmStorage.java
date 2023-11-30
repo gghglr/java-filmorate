@@ -18,9 +18,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Integer, Film> filmStorage = new HashMap<>();
 
     public Film updateFilm(Film film) {
-        if (filmStorage.containsKey(film.getId())) {
-            filmStorage.remove(film.getId());
-            filmStorage.put(film.getId(), film);
+        if (filmStorage.containsKey(film.getFilmId())) {
+            filmStorage.remove(film.getFilmId());
+            filmStorage.put(film.getFilmId(), film);
         } else {
             System.out.println("нечего добавить");
             throw new RuntimeException("нечего обновлять");
@@ -35,8 +35,8 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.error("ошибка в заполненных данных");
             throw new ValidationException("Ошибка в заполненных данных");
         }
-        film.setId(generateId++);
-        filmStorage.put(film.getId(), film);
+        film.setFilmId(generateId++);
+        filmStorage.put(film.getFilmId(), film);
         return film;
     }
 

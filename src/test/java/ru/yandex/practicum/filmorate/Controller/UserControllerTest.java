@@ -24,7 +24,7 @@ class UserControllerTest {
     @Test
     public void testUserEmptyName() {
         User user = new User(1, "asd@yandex.ru", "asd",
-                "", LocalDate.of(2000, 10, 10), null);
+                "", LocalDate.of(2000, 10, 10), null, null);
         userController.addUser(user);
 
         Assertions.assertEquals(user.getLogin(), user.getName());
@@ -33,11 +33,11 @@ class UserControllerTest {
     @Test
     public void testUserValidationException() {
         User user = new User(1, "asdyandex.ru", "asd",
-                "", LocalDate.of(2000, 10, 10), null);
+                "", LocalDate.of(2000, 10, 10), null, null);
         User user2 = new User(2, "asd@yandex.ru", "",
-                "", LocalDate.of(2000, 10, 10), null);
+                "", LocalDate.of(2000, 10, 10), null, null);
         User user3 = new User(3, "asd@yandex.ru", "asd",
-                "", LocalDate.of(2030, 10, 10), null);
+                "", LocalDate.of(2030, 10, 10), null, null);
 
         Assertions.assertThrows(ValidationException.class, () -> userController.addUser(user));
         Assertions.assertThrows(ValidationException.class, () -> userController.addUser(user2));
@@ -47,9 +47,9 @@ class UserControllerTest {
     @Test
     public void testCorrectUser() {
         User user = new User(1, "asd@yandex.ru", "asd",
-                "Pavel", LocalDate.of(2000, 10, 10), null);
+                "Pavel", LocalDate.of(2000, 10, 10), null, null);
         User user2 = new User(2, "asdasd@yandex.ru", "asdasd",
-                "Olga", LocalDate.of(2010, 11, 10), null);
+                "Olga", LocalDate.of(2010, 11, 10), null, null);
 
 
         Assertions.assertEquals(user, userController.addUser(user));
