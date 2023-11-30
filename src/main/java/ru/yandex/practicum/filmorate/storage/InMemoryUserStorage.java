@@ -26,18 +26,18 @@ public class InMemoryUserStorage implements UserStorage {
             log.error("ошибка в заполненных данных");
             throw new ValidationException("Ошибка в заполненных данных");
         }
-        user.setId(generatedId++);
+        user.setUserId(generatedId++);
         if (user.getName() == null || user.getName().equals("")) {
             user.setName(user.getLogin());
         }
-        userStorage.put(user.getId(), user);
+        userStorage.put(user.getUserId(), user);
         return user;
     }
 
     public User update(User user) {
-        if (userStorage.containsKey(user.getId())) {
-            userStorage.remove(user.getId());
-            userStorage.put(user.getId(), user);
+        if (userStorage.containsKey(user.getUserId())) {
+            userStorage.remove(user.getUserId());
+            userStorage.put(user.getUserId(), user);
         } else {
             System.out.println("нечего добавить");
             throw new RuntimeException("нечего обновлять");
