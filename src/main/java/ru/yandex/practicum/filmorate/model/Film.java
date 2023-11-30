@@ -15,8 +15,6 @@ import java.util.Set;
 @Data
 public class Film {
 
-    //таблица жанров: индитификатор жанра(ключ), название жанра
-    //таблица лайков: filId, Id user, который поставил лайк
     private Integer filmId;
     private String name;
     private String description;

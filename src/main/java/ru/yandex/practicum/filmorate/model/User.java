@@ -13,7 +13,6 @@ import java.util.Set;
 @Data
 public class User {
 
-    //таблица "дружбы": ID того кто скинул(ключ), того, кто получил, статус
     private Integer userId;
     private String email;
     private String login;
