@@ -1,4 +1,4 @@
-![Иллюстрация БД](https://github.com/gghglr/java-filmorate/raw/main/https://dbdiagram.io/d/65685f0a3be14957870b1099/image.png)
+![Иллюстрация БД](https://github.com/gghglr/java-filmorate/raw/main//Users/aleksejurlov/Downloads/database.pdf/image.png)
 Примеры запросов:
 Получение всех фильмов:
 SELECT name
