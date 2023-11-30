@@ -1,0 +1,26 @@
+Примеры запросов:
+Получение всех фильмов:
+SELECT name
+FROM film;
+Получение жанров фильма 
+SELECT f.name,
+g.name_genre
+FROM film AS f
+LEFT JOIN genre AS g ON f.film_id = g.film.id;
+Получение пользователей: 
+SELECT name 
+FROM user;
+Топ 5 популярных
+SELECT f.name,
+COUNT(l.user_id)
+FROM film
+LEFT JOIN likes AS l ON f.film_id = l.film_id
+GROUP BY f.film_id
+ORDER BY COUNT(l.user_id) DESC
+LIMIT 5;
+Общие друзья:
+SELECT u1.get_requset_user_id //выводим айди общих друзей
+FROM friends AS f1
+LEFT OUTER JOIN friends AS f2 ON f1.get_requset_user_id = f2.get_requset_user_id
+WHERE u1.user_id = id1(айди первого друга) AND u2.user_id = id2(айфди второго друга)
+AND status = 'friends';
