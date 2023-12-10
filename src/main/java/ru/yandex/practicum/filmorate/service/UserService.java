@@ -1,84 +1,69 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.Exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.storageDaoImpl.FriendsStorageDao;
+import ru.yandex.practicum.filmorate.storage.storageDaoImpl.UserStorageDaoImpl;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+@Slf4j
 @Service
 public class UserService {
 
     private UserStorage userStorage;
+    private final FriendsStorageDao friendsStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
+    public UserService(UserStorageDaoImpl userStorageDao, FriendsStorageDao friendsStorage) {
+        this.userStorage = userStorageDao;
+        this.friendsStorage = friendsStorage;
     }
 
-    public User addFriend(Integer sentRequestId, Integer getRequestId) {
-        if (sentRequestId > 0 && getRequestId > 0 && userStorage.getUserStorage().containsKey(sentRequestId) &&
-                userStorage.getUserStorage().containsKey(getRequestId)) {
-            User sentRequestUser = userStorage.getUserStorage().get(sentRequestId);
-            User getRequestUser = userStorage.getUserStorage().get(getRequestId);
-            sentRequestUser.addFriend(getRequestId);
-            getRequestUser.addFriend(sentRequestId);
-            return sentRequestUser;
-        } else {
-            throw new DataNotFoundException("Пользователь не найден");
+    public Collection<User> getAllUser() {
+        return userStorage.getAllUser();
+    }
+
+    public User getUserById(Integer id) {
+        return userStorage.getUserById(id);
+    }
+
+    public User create(User user) {
+        return userStorage.create(user);
+    }
+
+    public User update(User user) {
+        return userStorage.update(user);
+    }
+
+    public void addFriend(Integer userId, Integer friendId) {
+        if (getUserById(userId) == null || getUserById(friendId) == null) {
+            throw new DataNotFoundException("Не найдены пользователи с userId=" + userId + " или friendId=" + friendId);
         }
+        friendsStorage.addFriend(userId, friendId);
+        log.debug("Пользователю с id=" + userId + " добавлен друг с id=" + friendId);
     }
 
-    public User deleteFriend(Integer sentDelete, Integer getDelete) {
-        if (userStorage.getUserStorage().containsKey(sentDelete) &&
-                userStorage.getUserStorage().containsKey(getDelete)) {
-            User sentDeleteUser = userStorage.getUserStorage().get(sentDelete);
-            User getDeleteUser = userStorage.getUserStorage().get(getDelete);
-            sentDeleteUser.deleteFriend(getDelete);
-            getDeleteUser.deleteFriend(sentDelete);
-            return sentDeleteUser;
-        } else {
-            throw new RuntimeException("Пользователь не найден");
-        }
+    public void deleteFriend(Integer userId, Integer friendId) {
+        friendsStorage.deleteFriend(userId, friendId);
+        log.debug("У пользователя с id=" + userId + " удален друг с id=" + friendId);
     }
 
-    public List<User> showMutualFriend(Integer fistFriend, Integer secondFriend) {
-        if (userStorage.getUserStorage().containsKey(fistFriend) &&
-                userStorage.getUserStorage().containsKey(secondFriend)) {
-            User firstUser = userStorage.getUserStorage().get(fistFriend);
-            User secondUser = userStorage.getUserStorage().get(secondFriend);
-            List<User> mutualFriends = new ArrayList<>();
-            if (firstUser.getFriends() != null && secondUser.getFriends() != null) {
-                firstUser.getFriends().stream().filter(fist -> secondUser.getFriends().contains(fist))
-                        .forEach(fist -> mutualFriends.add(userStorage.getUserStorage().get(fist)));
-                return mutualFriends;
-            } else return new ArrayList<>();
-        } else {
-            throw new RuntimeException("Пользователь не найден");
-        }
+    public Collection<User> userFriends(Integer userId) {
+        log.debug("Запрошен список друзей пользовтеля с id=" + userId);
+        return friendsStorage.getFriendsByUserId(userId);
     }
 
-    public List<User> showAllFriend(Integer id) {
-        User user = userStorage.getUserStorage().get(id);
-        List<User> allFriend = new ArrayList<>();
-        user.getFriends().stream().forEach(friendId -> allFriend.add(userStorage.getUserStorage().get(friendId)));
-        return allFriend;
+    public List<User> commonFriends(Integer userId, Integer otherId) {
+        return friendsStorage.commonFriends(userId, otherId);
     }
 
-    public UserStorage getStorage() {
-        return userStorage;
-    }
 
-    public User getById(Integer id) {
-        if (userStorage.getUserStorage().containsKey(id)) {
-            return userStorage.getUserStorage().get(id);
-        } else {
-            throw new DataNotFoundException("Пользователь не найден");
-        }
-    }
 }
 
 

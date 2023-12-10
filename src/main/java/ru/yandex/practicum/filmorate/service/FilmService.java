@@ -2,57 +2,56 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.Exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.FilmLikesStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.storageDaoImpl.FilmStorageDaoImpl;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class FilmService {
 
-    private FilmStorage inMemoryFilmStorage;
+    private FilmStorage filmStorage;
+    private final UserService userService;
+    private final FilmLikesStorage filmLikesStorage;
 
     @Autowired
-    public FilmService(FilmStorage inMemoryFilmStorage) {
-        this.inMemoryFilmStorage = inMemoryFilmStorage;
+    public FilmService(FilmStorageDaoImpl filmStorage, UserService userService, FilmLikesStorage filmLikesStorage) {
+        this.filmStorage = filmStorage;
+        this.userService = userService;
+        this.filmLikesStorage = filmLikesStorage;
     }
 
-    public Set<Integer> setLike(Integer idFilm, Integer userId) {
-        if (inMemoryFilmStorage.getFilmMap().containsKey(idFilm)) {
-            Film film = inMemoryFilmStorage.getFilmMap().get(idFilm);
-            film.setLike(userId);
-            return film.getLikes();
-        } else {
-            throw new RuntimeException("Нет запрашеваемого фильма или поста");
-        }
+    public Film create(Film film) {
+        return filmStorage.create(film);
     }
 
-    public Set<Integer> deleteLike(Integer idFilm, Integer userId) {
-        if (inMemoryFilmStorage.getFilmMap().containsKey(idFilm)) {
-            Film film = inMemoryFilmStorage.getFilmMap().get(idFilm);
-            film.deleteLike(userId);
-            return film.getLikes();
-        } else {
-            throw new RuntimeException("Нет запрашеваемого фильма или поста");
-        }
+    public Collection<Film> getAllFilm() {
+        return filmStorage.getAllFilm();
     }
 
-    public List<Film> getPopular(Integer count) {
-        return inMemoryFilmStorage.sort(count);
-    }
-
-    public FilmStorage getFilmStorage() {
-        return inMemoryFilmStorage;
+    public Film update(Film film) {
+        return filmStorage.updateFilm(film);
     }
 
     public Film getFilmById(Integer id) {
-        if (inMemoryFilmStorage.getFilmMap().containsKey(id)) {
-            return inMemoryFilmStorage.getFilmMap().get(id);
-        } else {
-            throw new DataNotFoundException("Фильм не найден");
-        }
+        return filmStorage.getFilmById(id);
+    }
+
+    public void addLike(Integer filmId, Integer userId) {
+        filmLikesStorage.addLikeByFilmId(filmId, userId);
+    }
+
+    public void deleteLike(Integer filmId, Integer userId) {
+        getFilmById(filmId);
+        userService.getUserById(userId);
+        filmLikesStorage.deleteLikeByFilmId(filmId, userId);
+    }
+
+    public List<Film> topFilms(Integer count) {
+        return filmLikesStorage.topFilms(count);
     }
 
 }
