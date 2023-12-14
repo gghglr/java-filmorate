@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.storageDaoImpl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -10,20 +11,17 @@ import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
+import java.util.List;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class MpaStorageDao implements MpaStorage {
 
-    JdbcTemplate jdbcTemplate;
-
-    public MpaStorageDao(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Collection<Mpa> findAll() {
+    public List<Mpa> findAll() {
         String sql = "SELECT * FROM ratings";
         return jdbcTemplate.query(sql, mpaRowMapper());
     }

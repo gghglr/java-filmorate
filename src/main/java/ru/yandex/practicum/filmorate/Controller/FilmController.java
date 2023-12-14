@@ -15,6 +15,7 @@ import java.util.*;
 @Component
 @RestController
 public class FilmController {
+
     private FilmService filmService;
 
     @Autowired
@@ -23,7 +24,7 @@ public class FilmController {
     }
 
     @GetMapping("/films")
-    public Collection<Film> showAllFilm() {
+    public List<Film> showAllFilm() {
         return filmService.getAllFilm();
     }
 

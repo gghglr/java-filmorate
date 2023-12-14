@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.storageDaoImpl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -16,17 +16,12 @@ import java.sql.SQLException;
 import java.util.*;
 
 @Slf4j
-@Component
+@Component("filmStorageDaoImpl")
+@RequiredArgsConstructor
 public class FilmStorageDaoImpl implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final FilmGenresDbStorage filmGenresDbStorage;
-
-    @Autowired
-    public FilmStorageDaoImpl(JdbcTemplate jdbcTemplate, FilmGenresDbStorage filmGenresDbStorage) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.filmGenresDbStorage = filmGenresDbStorage;
-    }
 
     @Override
     public Film create(Film film) {
@@ -82,16 +77,11 @@ public class FilmStorageDaoImpl implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> getAllFilm() {
+    public List<Film> getAllFilm() {
         String sql = "SELECT * FROM films f JOIN ratings r ON r.rating_id = f.rating_id ORDER BY film_id;";
-        Collection<Film> films = jdbcTemplate.query(sql, filmRowMapper());
+        List<Film> films = jdbcTemplate.query(sql, filmRowMapper());
         log.info("Из БД получен списк фильмов:" + films);
         return films;
-    }
-
-    @Override
-    public Map<Integer, Film> getFilmMap() {
-        return null;
     }
 
     protected RowMapper<Film> filmRowMapper() {

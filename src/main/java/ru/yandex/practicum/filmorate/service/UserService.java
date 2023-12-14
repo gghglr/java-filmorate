@@ -2,30 +2,29 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.Exception.DataNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.storageDaoImpl.FriendsStorageDao;
-import ru.yandex.practicum.filmorate.storage.storageDaoImpl.UserStorageDaoImpl;
 
-import java.util.Collection;
 import java.util.List;
 
 @Slf4j
 @Service
 public class UserService {
 
-    private UserStorage userStorage;
+    private final UserStorage userStorage;
     private final FriendsStorageDao friendsStorage;
 
     @Autowired
-    public UserService(UserStorageDaoImpl userStorageDao, FriendsStorageDao friendsStorage) {
-        this.userStorage = userStorageDao;
+    public UserService(@Qualifier("userStorageDaoImpl") UserStorage userStorage, FriendsStorageDao friendsStorage) {
+        this.userStorage = userStorage;
         this.friendsStorage = friendsStorage;
     }
 
-    public Collection<User> getAllUser() {
+    public List<User> getAllUser() {
         return userStorage.getAllUser();
     }
 
@@ -54,7 +53,7 @@ public class UserService {
         log.debug("У пользователя с id=" + userId + " удален друг с id=" + friendId);
     }
 
-    public Collection<User> userFriends(Integer userId) {
+    public List<User> userFriends(Integer userId) {
         log.debug("Запрошен список друзей пользовтеля с id=" + userId);
         return friendsStorage.getFriendsByUserId(userId);
     }

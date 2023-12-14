@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.storageDaoImpl;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -9,16 +9,11 @@ import ru.yandex.practicum.filmorate.storage.FilmLikesStorage;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class FilmLikesStorageDao implements FilmLikesStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final FilmStorageDaoImpl filmStorageDao;
-
-    @Autowired
-    public FilmLikesStorageDao(JdbcTemplate jdbcTemplate, FilmStorageDaoImpl filmStorageDao) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.filmStorageDao = filmStorageDao;
-    }
 
     @Override
     public void addLikeByFilmId(Integer filmId, Integer userId) {

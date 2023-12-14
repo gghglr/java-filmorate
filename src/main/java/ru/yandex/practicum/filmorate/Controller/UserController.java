@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import ru.yandex.practicum.filmorate.Exception.ValidationException;
+
 import java.time.LocalDate;
 import java.util.*;
 
@@ -24,7 +25,7 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public Collection<User> showAllUser() {
+    public List<User> showAllUser() {
         return userService.getAllUser();
     }
 
@@ -56,7 +57,7 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}/friends")
-    public Collection<User> userFriends(@PathVariable("id") Integer userId) {
+    public List<User> userFriends(@PathVariable("id") Integer userId) {
         return userService.userFriends(userId);
     }
 

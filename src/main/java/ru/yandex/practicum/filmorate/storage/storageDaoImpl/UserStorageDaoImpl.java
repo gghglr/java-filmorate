@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.storageDaoImpl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -16,18 +16,14 @@ import java.util.*;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class UserStorageDaoImpl implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    public UserStorageDaoImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
-    public Collection<User> getAllUser() {
+    public List<User> getAllUser() {
         String sql = "SELECT * FROM users";
-        Collection<User> users = jdbcTemplate.query(sql, userRowMapper());
+        List<User> users = jdbcTemplate.query(sql, userRowMapper());
         log.info("Из БД получен список пользователей:" + users);
         return users;
     }

@@ -1,24 +1,24 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmLikesStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.storageDaoImpl.FilmStorageDaoImpl;
 
-import java.util.Collection;
 import java.util.List;
 
 @Service
 public class FilmService {
 
-    private FilmStorage filmStorage;
+    private final FilmStorage filmStorage;
     private final UserService userService;
     private final FilmLikesStorage filmLikesStorage;
 
     @Autowired
-    public FilmService(FilmStorageDaoImpl filmStorage, UserService userService, FilmLikesStorage filmLikesStorage) {
+    public FilmService(@Qualifier("filmStorageDaoImpl") FilmStorage filmStorage, UserService userService,
+                       FilmLikesStorage filmLikesStorage) {
         this.filmStorage = filmStorage;
         this.userService = userService;
         this.filmLikesStorage = filmLikesStorage;
@@ -28,7 +28,7 @@ public class FilmService {
         return filmStorage.create(film);
     }
 
-    public Collection<Film> getAllFilm() {
+    public List<Film> getAllFilm() {
         return filmStorage.getAllFilm();
     }
 

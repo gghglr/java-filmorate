@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.storageDaoImpl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
@@ -11,19 +11,14 @@ import java.util.*;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class FriendsStorageDao implements FriendsStorage {
 
-    JdbcTemplate jdbcTemplate;
-    UserStorageDaoImpl userStorageDao;
-
-    @Autowired
-    public FriendsStorageDao(JdbcTemplate jdbcTemplate, UserStorageDaoImpl userStorageDao) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.userStorageDao = userStorageDao;
-    }
+    private final JdbcTemplate jdbcTemplate;
+    private final UserStorageDaoImpl userStorageDao;
 
     @Override
-    public Collection<User> getFriendsByUserId(Integer userId) {
+    public List<User> getFriendsByUserId(Integer userId) {
         String sql = "SELECT * from users WHERE user_id in( SELECT friend_id from friends where user_id = ?);";
         return jdbcTemplate.query(sql, userStorageDao.userRowMapper(), userId);
     }

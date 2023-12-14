@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.storage.storageDaoImpl;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -14,28 +14,22 @@ import ru.yandex.practicum.filmorate.storage.FilmGenresStorage;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class FilmGenresDbStorage implements FilmGenresStorage {
     private final JdbcTemplate jdbcTemplate;
     private final GenreDbStorage genreDbStorage;
 
-    @Autowired
-    public FilmGenresDbStorage(JdbcTemplate jdbcTemplate, GenreDbStorage genreDbStorage) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.genreDbStorage = genreDbStorage;
-    }
-
     @Override
-    public Collection<Genre> getGenresByFilmId(Integer filmId) {
+    public List<Genre> getGenresByFilmId(Integer filmId) {
         String sql = "SELECT fg.genre_id, g.genre_name " +
                 "FROM films_genres fg " +
                 "JOIN genres g ON g.genre_id = fg.genre_id " +
                 "WHERE film_id = ?";
-        Collection<Genre> filmGenres = jdbcTemplate.query(sql, genreDbStorage.genreRowMapper(), filmId);
+        List<Genre> filmGenres = jdbcTemplate.query(sql, genreDbStorage.genreRowMapper(), filmId);
         log.warn("Фильм с id=" + filmId + " имеет в БД список жанров: " + filmGenres);
         return filmGenres;
     }
