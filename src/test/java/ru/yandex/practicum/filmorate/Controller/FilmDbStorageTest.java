@@ -40,7 +40,7 @@ class FilmDbStorageTest {
                 120, new Mpa(1, "G"));
         filmStorage.create(film);
 
-        Film savedFilm = filmStorage.getFilmById(1);
+        Film savedFilm = filmStorage.getFilmById(2);
 
         assertThat(savedFilm)
                 .isNotNull()
