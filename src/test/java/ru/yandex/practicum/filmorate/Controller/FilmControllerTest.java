@@ -24,11 +24,11 @@ class FilmControllerTest {
     private UserStorage userStorage;
 
     private FriendsStorageDao friendsStorage;
-    
     private FilmLikesStorage filmLikesStorage;
 
     @BeforeEach
     public void setUp() {
+
         filmStorage = new InMemoryFilmStorage();
         userStorage = new InMemoryUserStorage();
         userService = new UserService(userStorage, friendsStorage);
@@ -61,7 +61,6 @@ class FilmControllerTest {
                 120, null);
         Film film2 = new Film(2, "Tom", "NewFilm", LocalDate.of(2020, 11, 9),
                 120, null);
-
 
         Assertions.assertEquals(film, filmController.create(film));
         Assertions.assertEquals(film2, filmController.create(film2));
