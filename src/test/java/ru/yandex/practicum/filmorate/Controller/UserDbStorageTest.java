@@ -20,7 +20,7 @@ class UserDbStorageTest {
     private UserStorageDaoImpl userStorage;
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         userStorage = new UserStorageDaoImpl(jdbcTemplate);
     }
 
