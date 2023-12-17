@@ -1,37 +1,23 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import ru.yandex.practicum.filmorate.Exception.DataNotFoundException;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-@NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Builder
 public class Film {
 
-    private Integer filmId;
+    private int id;
     private String name;
     private String description;
     private LocalDate releaseDate;
-    private Long duration;
-    private Set<Integer> likes = new HashSet<>();
-    private String rating;
-
-    public void setLike(Integer id) {
-        likes.add(id);
-    }
-
-    public void deleteLike(Integer id) {
-        if (id <= 0) {
-            throw new DataNotFoundException("Пользователь не найден");
-        }
-        likes.remove(id);
-    }
+    private int duration;
+    private Mpa mpa;
+    private final Set<Genre> genres = new TreeSet<>(Comparator.comparing(Genre::getId));
 
 }
