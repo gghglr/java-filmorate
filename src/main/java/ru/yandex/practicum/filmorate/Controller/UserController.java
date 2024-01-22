@@ -1,66 +1,94 @@
-package ru.yandex.practicum.filmorate.Controller;
+package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FeedEvent;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FeedService;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.*;
+import java.util.List;
 
-@Slf4j
-@Component
 @RestController
+@RequestMapping("/users")
 public class UserController {
-
-    private UserStorage inMemoryUserStorage;
+    private Logger log = LoggerFactory.getLogger(UserController.class);
     private UserService userService;
+    private FeedService feedService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, FeedService feedService) {
         this.userService = userService;
-        inMemoryUserStorage = userService.getStorage();
+        this.feedService = feedService;
     }
 
-    @GetMapping("/users")
-    public List<User> showAllUser() {
-        return inMemoryUserStorage.getAllUser();
+    @GetMapping
+    public List<User> findAll() {
+        log.info("Получен запрос на получение списка всех пользователей");
+        return userService.findAll();
     }
 
-    @GetMapping("/users/{id}")
-    public User getUserById(@PathVariable Integer id) {
-        return userService.getById(id);
+    @GetMapping("/{id}")
+    public User findById(@PathVariable("id") int id) {
+        log.info("Получен запрос на поиск пользователя с id {}", id);
+        return userService.findById(id);
     }
 
-    @PostMapping("/users")
-    public User addUser(@RequestBody User user) {
-        return inMemoryUserStorage.addUser(user);
+    @PostMapping
+    public User create(@RequestBody User user) {
+        log.info("Получен запрос на создание пользователя");
+        return userService.create(user);
     }
 
-    @PutMapping("/users")
+    @PutMapping
     public User update(@RequestBody User user) {
-        return inMemoryUserStorage.update(user);
+        log.info("Получен запрос на обновление пользователя с id {}", user.getId());
+        return userService.update(user);
     }
 
-    @PutMapping("/users/{id}/friends/{friendId}")
-    public User addFriend(@PathVariable int id, @PathVariable int friendId) {
-        return userService.addFriend(id, friendId);
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable("id") int id, @PathVariable("friendId") int friendId) {
+        log.info("Получен запрос на добавление в друзья от пользователя с id {} для пользователя с id {}", id, friendId);
+        userService.addFriend(id, friendId);
     }
 
-    @DeleteMapping("/users/{id}/friends/{friendId}")
-    public User deleteFriend(@PathVariable int id, @PathVariable int friendId) {
-        return userService.deleteFriend(id, friendId);
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable("id") int id, @PathVariable("friendId") int friendId) {
+        log.info("Получен запрос на уделаение из друзей от пользователя с id {} для пользователя с id {}", id, friendId);
+        userService.deleteFriend(id, friendId);
     }
 
-    @GetMapping("/users/{id}/friends")
-    public List<User> showAllFriend(@PathVariable int id) {
-        return userService.showAllFriend(id);
+    @GetMapping("/{id}/friends")
+    public List<User> getAllFriends(@PathVariable("id") int id) {
+        log.info("Получен запрос на получение списка всех друзей пользователя с id {}", id);
+        return userService.getAllFriends(id);
     }
 
-    @GetMapping("/users/{id}/friends/common/{otherId}")
-    public List<User> showMutualFriends(@PathVariable int id, @PathVariable int otherId) {
-        return userService.showMutualFriend(id, otherId);
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable("id") int id, @PathVariable("otherId") int otherId) {
+        log.info("Получен запрос на получение списка общих друзей для пользователей с id {} и {}", id, otherId);
+        return userService.getCommonFriends(id, otherId);
+    }
+
+    @GetMapping("/{id}/feed")
+    public List<FeedEvent> getFeedForUser(@PathVariable("id") int idUser) {
+        userService.findById(idUser);
+        log.info("Получен запрос на получение списка последних событий для пользователей с id {}", idUser);
+        return feedService.getFeedForUser(idUser);
+    }
+
+    @GetMapping("/{id}/recommendations")
+    public List<Film> getRecommendations(@PathVariable("id") int id) {
+        log.info("Получен запрос на получение рекомендаций для пользователя с id {}", id);
+        return userService.getRecommendations(id);
+    }
+
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable("userId") int userId) {
+        log.info("Получен запрос на удаление пользователя с id = " + userId);
+        userService.delete(userId);
     }
 }
