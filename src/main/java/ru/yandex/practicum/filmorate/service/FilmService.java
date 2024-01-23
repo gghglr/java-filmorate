@@ -1,88 +1,65 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dbstorage.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.SqlException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class FilmService {
     private static final int MAX_SYMBOLS = 200;
     private static final LocalDate RELEASE_DATA = LocalDate.of(1895, 12, 28);
     private final FilmDbStorage filmDbStorage;
-    private final UserDbStorage userDbStorage;
     private final FilmLikesDbStorage filmLikesDbStorage;
-    private final FilmGenreDbStorage filmGenreDbStorage;
     private final JdbcTemplate jdbcTemplate;
     private final FeedService feedService;
-    private Logger log = LoggerFactory.getLogger(FilmService.class);
     private final DirectorDbStorage directorDbStorage;
 
     @Autowired
-    public FilmService(FilmDbStorage filmDbStorage, UserDbStorage userDbStorage, FilmLikesDbStorage filmLikesDbStorage,
-                       FilmGenreDbStorage filmGenreDbStorage, JdbcTemplate jdbcTemplate, FeedService feedService,
+    public FilmService(FilmDbStorage filmDbStorage,
+                       FilmLikesDbStorage filmLikesDbStorage,
+                       JdbcTemplate jdbcTemplate,
+                       FeedService feedService,
                        DirectorDbStorage directorDbStorage) {
         this.filmDbStorage = filmDbStorage;
-        this.userDbStorage = userDbStorage;
         this.filmLikesDbStorage = filmLikesDbStorage;
-        this.filmGenreDbStorage = filmGenreDbStorage;
         this.jdbcTemplate = jdbcTemplate;
         this.feedService = feedService;
         this.directorDbStorage = directorDbStorage;
     }
 
     public List<Film> findAll() {
-        return filmDbStorage.findAll().stream().map(film -> {
-            try {
-                return makeGenreForFilm(film);
-            } catch (SQLException e) {
-                throw new SqlException("Ошибка в добавлении жанров для фильма");
-            }
-        }).collect(Collectors.toList());
+        return filmDbStorage.findAll().stream().map(this::makeGenreForFilm).collect(Collectors.toList());
     }
 
     public Film findById(int id) {
         validFound(id);
-        try {
-            return makeGenreForFilm(filmDbStorage.findById(id));
-        } catch (SQLException e) {
-            throw new SqlException("Ошибка в добавлении жанров для фильма");
-        }
+        return makeGenreForFilm(filmDbStorage.findById(id));
     }
 
     public Film create(Film film) {
         validate(film);
         int id = filmDbStorage.create(film);
-        try {
-            log.info("Фильм создан с id {}", id);
-            return makeGenreForFilm(filmDbStorage.findById(id));
-        } catch (SQLException e) {
-            throw new SqlException("Ошибка в добавлении жанров для фильма");
-        }
+        log.info("Фильм создан с id {}", id);
+        return makeGenreForFilm(filmDbStorage.findById(id));
     }
 
     public Film update(Film film) {
         validFound(film.getId());
         validate(film);
-        try {
-            return makeGenreForFilm(filmDbStorage.findById(filmDbStorage.update(film)));
-        } catch (SQLException e) {
-            throw new SqlException("Ошибка в добавлении жанров для фильма");
-        }
+        return makeGenreForFilm(filmDbStorage.findById(filmDbStorage.update(film)));
     }
 
     public List<Film> getPopularFilmsWithGenreAndYear(int count, int idGenre, int year) {
@@ -91,62 +68,38 @@ public class FilmService {
             validFoundForYear(year);
             return filmLikesDbStorage.getPopularFilmsWithGenreAndYear(count, idGenre, year)
                     .stream()
-                    .map(film -> {
-                        try {
-                            return addDirector(makeGenreForFilm(film));
-                        } catch (SQLException e) {
-                            throw new SqlException("Ошибка в добавлении жанров для фильма");
-                        }
-                    }).collect(Collectors.toList());
+                    .map(film -> addDirector(makeGenreForFilm(film))).collect(Collectors.toList());
         }
         if (idGenre == -1 && year != -1) {
             validFoundForYear(year);
             return filmLikesDbStorage.getPopularFilmsWithYear(count, year)
                     .stream()
-                    .map(film -> {
-                        try {
-                            return addDirector(makeGenreForFilm(film));
-                        } catch (SQLException e) {
-                            throw new SqlException("Ошибка в добавлении жанров для фильма");
-                        }
-                    })
+                    .map(film -> addDirector(makeGenreForFilm(film)))
                     .collect(Collectors.toList());
         }
         if (idGenre != -1 && year == -1) {
             validFoundForGenre(idGenre);
             return filmLikesDbStorage.getPopularFilmsWithGenre(count, idGenre)
                     .stream()
-                    .map(film -> {
-                        try {
-                            return addDirector(makeGenreForFilm(film));
-                        } catch (SQLException e) {
-                            throw new SqlException("Ошибка в добавлении жанров для фильма");
-                        }
-                    })
+                    .map(film -> addDirector(makeGenreForFilm(film)))
                     .collect(Collectors.toList());
         }
         return filmLikesDbStorage.getPopularFilms(count)
                 .stream()
-                .map(film -> {
-                    try {
-                        return addDirector(makeGenreForFilm(film));
-                    } catch (SQLException e) {
-                        throw new SqlException("Ошибка в добавлении жанров для фильма");
-                    }
-                })
+                .map(film -> addDirector(makeGenreForFilm(film)))
                 .collect(Collectors.toList());
     }
 
     public void deleteLike(int idFilm, int idUser) {
         validFound(idFilm);
-        validFoundForUser(idUser);
+        checkUserExists(idUser);
         filmLikesDbStorage.deleteLike(idFilm, idUser);
         feedService.createDeleteLikesEvent(idUser, idFilm);
     }
 
     public void addLikes(int idFilm, int idUser) {
         validFound(idFilm);
-        validFoundForUser(idUser);
+        checkUserExists(idUser);
         filmLikesDbStorage.addLikes(idFilm, idUser);
         feedService.addLikesEvent(idUser, idFilm);
     }
@@ -178,7 +131,7 @@ public class FilmService {
         }
     }
 
-    private void validFoundForUser(int idUser) {
+    private void checkUserExists(int idUser) {
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from user_filmorate where user_id = ?", idUser);
         if (!userRows.next()) {
             throw new NotFoundException("id " + idUser + " не найден");
@@ -198,7 +151,7 @@ public class FilmService {
         }
     }
 
-    private Film makeGenreForFilm(Film film) throws SQLException {
+    private Film makeGenreForFilm(Film film) {
         Set<Genre> genres = new TreeSet<>((genre1, genre2) -> {
             if (genre1.getId() < genre2.getId()) return -1;
             else return 1;
@@ -246,31 +199,19 @@ public class FilmService {
     public List<Film> getDirectorFilms(int directorId, String sortBy) {
         directorDbStorage.findById(directorId);
         return filmDbStorage.getDirectorFilms(directorId, sortBy).stream()
-                .map(film -> {
-                    try {
-                        return makeGenreForFilm(film);
-                    } catch (SQLException e) {
-                        throw new SqlException("Ошибка в добавлении жанров для фильма");
-                    }
-                })
+                .map(this::makeGenreForFilm)
                 .collect(Collectors.toList());
     }
 
     public List<Film> search(String query, String by) {
         return filmDbStorage.search(query, by).stream()
-                .map(film -> {
-                    try {
-                        return makeGenreForFilm(film);
-                    } catch (SQLException e) {
-                        throw new SqlException("Ошибка в добавлении жанров для фильма");
-                    }
-                })
+                .map(this::makeGenreForFilm)
                 .collect(Collectors.toList());
     }
 
     public List<Film> getCommonFilms(int userId, int friendId) {
-        validFoundForUser(userId);
-        validFoundForUser(friendId);
+        checkUserExists(userId);
+        checkUserExists(friendId);
         List<Film> usersLikedFilms = filmLikesDbStorage.getLikedFilms(userId, friendId);
         return usersLikedFilms;
     }

@@ -91,8 +91,8 @@ public class FilmDbStorage implements FilmStorageDao {
             saveFilmGenre(film.getId(), genres);
         }
 
-        String sqlDelete2 = "delete from film_director where film_id = ?";
-        jdbcTemplate.update(sqlDelete2, film.getId());
+        String sqlDeleteFilmDirector = "delete from film_director where film_id = ?";
+        jdbcTemplate.update(sqlDeleteFilmDirector, film.getId());
         if (!film.getDirectors().isEmpty()) {
             List<Director> directors = new ArrayList<>(film.getDirectors());
             saveFilmDirector(film.getId(), directors);

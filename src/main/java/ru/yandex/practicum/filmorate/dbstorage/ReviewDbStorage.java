@@ -47,7 +47,7 @@ public class ReviewDbStorage implements ReviewStorageDao {
 
     @Override
     public Review update(Review review) {
-        String sql = "UPDATE review SET content = ?, is_positive = ? WHERE review_id = ?;";
+        String sql = "update review set content = ?, is_positive = ? where review_id = ?;";
         jdbcTemplate.update(sql, review.getContent(), review.getIsPositive(),
                 review.getReviewId());
         return getById(review.getReviewId());
@@ -55,7 +55,7 @@ public class ReviewDbStorage implements ReviewStorageDao {
 
     @Override
     public Review getById(Integer id) {
-        String sql = "SELECT * FROM review WHERE review_id = ?";
+        String sql = "select * from review where review_id = ?";
         try {
             return jdbcTemplate.queryForObject(sql, reviewRowMapper(), id);
         } catch (RuntimeException e) {
@@ -66,22 +66,22 @@ public class ReviewDbStorage implements ReviewStorageDao {
 
     @Override
     public void putReaction(Integer id, Integer userId, Boolean reaction) {
-        String sql = "INSERT INTO review_likes VALUES(?, ?, ?);";
+        String sql = "insert into review_likes values(?, ?, ?);";
         jdbcTemplate.update(sql, id, userId, reaction);
         Review review = getById(id);
         review.setUseful(useful(id));
     }
 
     public Integer useful(Integer id) {
-        String sqlLikes = "SELECT COUNT(user_id)" +
-                " FROM review_likes" +
-                " WHERE review_id = ? AND is_positive = true";
-        String sqlDislikes = "SELECT COUNT(user_id)" +
-                " FROM review_likes" +
-                " WHERE review_id = ? AND is_positive = false";
+        String sqlLikes = "select count(user_id)" +
+                " from review_likes" +
+                " where review_id = ? and is_positive = true";
+        String sqlDislikes = "select count(user_id)" +
+                " from review_likes" +
+                " where review_id = ? and is_positive = false";
         Integer likeCount = jdbcTemplate.queryForObject(sqlLikes, Integer.class, id);
         Integer dislikeCount = jdbcTemplate.queryForObject(sqlDislikes, Integer.class, id);
-        String sql = "UPDATE review SET useful = ? WHERE review_id = ?;";
+        String sql = "update review set useful = ? where review_id = ?;";
         Integer useful = likeCount - dislikeCount;
         jdbcTemplate.update(sql, useful, id);
         return useful;
@@ -89,24 +89,24 @@ public class ReviewDbStorage implements ReviewStorageDao {
 
     @Override
     public void deleteReaction(Integer id, Integer userId) {
-        String sql = "DELETE FROM review_likes WHERE review_id = ? AND user_id = ?;";
+        String sql = "delete from review_likes where review_id = ? and user_id = ?;";
         jdbcTemplate.update(sql, id, userId);
     }
 
     @Override
     public void deleteReview(Integer id) {
-        String sql = "DELETE FROM review WHERE review_id = ?;";
+        String sql = "delete from review where review_id = ?;";
         jdbcTemplate.update(sql, id);
     }
 
     @Override
     public List<Review> getReviews(Integer filmId, Integer count) {
         if (filmId == null) {
-            String sql = "SELECT * FROM review ORDER BY useful DESC LIMIT ?;";
+            String sql = "select * from review order by useful desc limit ?;";
             List<Review> reviews = jdbcTemplate.query(sql, reviewRowMapper(), count);
             return reviews;
         }
-        String sql = "SELECT * FROM review WHERE film_id = ? ORDER BY useful DESC LIMIT ?;";
+        String sql = "select * from review where film_id = ? order BY useful desc limit ?;";
         List<Review> reviews = jdbcTemplate.query(sql, reviewRowMapper(), filmId, count);
         return reviews;
     }

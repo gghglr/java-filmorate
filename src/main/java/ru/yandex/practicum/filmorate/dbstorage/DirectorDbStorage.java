@@ -25,7 +25,7 @@ public class DirectorDbStorage implements DirectorStorageDao {
 
     @Override
     public List<Director> findAll() {
-        String sql = "SELECT * FROM director;";
+        String sql = "select * from director;";
         return jdbcTemplate.query(sql, makeDirector());
     }
 
@@ -63,9 +63,9 @@ public class DirectorDbStorage implements DirectorStorageDao {
             throw new NotFoundException("Не найден режиссер с ID=" + director.getId());
         }
 
-        String sql = "UPDATE director SET " +
+        String sql = "update director SET " +
                 "name_director = ?" +
-                "WHERE id = ?;";
+                "where id = ?;";
 
         jdbcTemplate.update(sql, director.getName(), director.getId());
 
@@ -75,7 +75,7 @@ public class DirectorDbStorage implements DirectorStorageDao {
 
     @Override
     public void delete(int id) {
-        String sql = "DELETE FROM director WHERE id = ?;";
+        String sql = "delete from director where id = ?;";
         jdbcTemplate.update(sql, id);
         log.debug("В БД удален режиссер с ID=" + id);
     }

@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -24,8 +23,8 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class UserService {
-    protected Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserDbStorage userDbStorage;
     private final JdbcTemplate jdbcTemplate;
     private final UserRelationshipDbStorage userRelationshipDbStorage;
